@@ -1,9 +1,9 @@
 from yelpapi import YelpAPI
-import pandas as pd
 import nltk
 import re
 from collections import Counter
 from nltk.corpus import stopwords
+import pandas as pd
 
 # Download necessary resources
 nltk.download('punkt')
@@ -11,29 +11,41 @@ nltk.download('stopwords')
 
 # Define stop words
 stop_words = set(stopwords.words('english'))
-
+# Load API Key
 api_key = "OOpEeCR5qwIhPANDoLPwFZGeIwKCNz4LBwzhFOjVPTSXZAciFi4vuvrAyOX0kJ1gBH88Spo5547wl6PdB1oix-yrk1Un65DXH1Gv5cj83QZtrgJKwzyFuDrA6-BMZXYx"
-
+# Define Terms
 yelp_api = YelpAPI(api_key)
 search_term = 'sushi'
 location_term = 'El Paso, TX'
 
+# Query trough the search algorithm to pull out 20 restaurants sorted by rating
+search_results = yelp_api.search_query(
+    term=search_term, location=location_term,
+    sort_by='rating', limit=20
+)
+
+# Converting list of json objects to Pandas Data Frame
+result_df = pd.DataFrame.from_dict(search_results['businesses'])
+result_df.to_csv("yelpapi_businesses_results.csv")
+
 # List of restaurant names to include
 restaurant_names = [
-    'el-charlatan-socorro',
-    'sunnys-sushi-horizon-city-2',
-    'poke-bar-el-paso-10',
-    'tugboat-fish-and-chips-el-paso',
-    'kees-teriyaki-and-sushi-el-paso'
+    'sushi-garden-el-paso',
+    'nomi-el-paso',
+    'matsuharu-japanese-restaurant-el-paso',
+    'sunnys-sushi-el-paso-2',
+    'korea-house-restaurant-el-paso-3'
 ]
+
+# Read the CSV file using pandas
+df = pd.read_csv('yelpapi_businesses_results.csv')
 
 # Number of reviews to analyze for each restaurant
 reviews_limit = 3
-
+#Initiate for loop to go through the list of each restaurant in our list restaurant_names
 for restaurant_name in restaurant_names:
     # Initialize a Counter to store word frequencies for each restaurant
     word_freq_counter = Counter()
-
     # Extract reviews directly from the reviews response for the specific restaurant
     reviews_response = yelp_api.reviews_query(id=restaurant_name, limit=reviews_limit)
 
